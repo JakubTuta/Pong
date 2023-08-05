@@ -1,101 +1,7 @@
 import pygame
 
-WINDOW_WIDTH = 1100
-WINDOW_HEIGHT = 600
-FPS = 60
-
-COLORS = {"black": (0, 0, 0), "white": (255, 255, 255)}
-
-pygame.init()
-font = pygame.font.SysFont(None, 60)
-
-
-class Ball:
-    radius = 15
-    baseSpeed = 10
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.speedX = Ball.baseSpeed
-        self.speedY = 0
-
-    def draw(self, WIN):
-        pygame.draw.circle(WIN, COLORS["white"], (self.x, self.y), Ball.radius)
-
-    def move(self):
-        self.x += self.speedX
-        self.y += self.speedY
-
-    def reset(self):
-        self.x = WINDOW_WIDTH // 2
-        self.y = WINDOW_HEIGHT // 2
-        self.speedY = 0
-
-    def calculateDirection(self, paddle):
-        self.speedX *= -1
-
-        if paddle.prevPosition < paddle.currentPosition:
-            self.speedY = Ball.baseSpeed
-
-        elif paddle.prevPosition > paddle.currentPosition:
-            self.speedY = -Ball.baseSpeed
-
-
-class Wall:
-    height = 30
-    topY = height
-    bottomY = WINDOW_HEIGHT - height
-
-    def draw(self, WIN):
-        pygame.draw.rect(WIN, COLORS["white"], (0, 0, WINDOW_WIDTH, Wall.height))
-        pygame.draw.rect(
-            WIN,
-            COLORS["white"],
-            (0, Wall.bottomY, WINDOW_WIDTH, Wall.height),
-        )
-
-
-class Paddle:
-    height = 100
-    width = 20
-    __padding = 50
-    __speed = 10
-
-    def __init__(self, side):
-        if side == "left":
-            self.x = Paddle.__padding
-        else:
-            self.x = WINDOW_WIDTH - Paddle.__padding - Paddle.width
-        self.y = WINDOW_HEIGHT / 2 - Paddle.height / 2
-
-        self.prevPosition = self.y
-        self.currentPosition = self.y
-
-    def draw(self, WIN):
-        pygame.draw.rect(
-            WIN, COLORS["white"], (self.x, self.y, Paddle.width, Paddle.height)
-        )
-
-    def move(self, direction):
-        if direction == "up":
-            if self.isMoveUpAvailable():
-                self.y -= Paddle.__speed
-
-        elif direction == "down":
-            if self.isMoveDownAvailable():
-                self.y += Paddle.__speed
-
-        self.currentPosition = self.y
-
-    def isMoveUpAvailable(self):
-        return self.y > Wall.topY
-
-    def isMoveDownAvailable(self):
-        return self.y + Paddle.height < Wall.bottomY
-
-    def set(self):
-        self.prevPosition = self.y
+from classess import Ball, Paddle, Wall
+from globals import COLORS, FPS, WINDOW_HEIGHT, WINDOW_WIDTH, font
 
 
 def everyFrame(playerLeft, playerRight):
@@ -173,32 +79,52 @@ def draw(WIN, ball, walls, playerLeft, playerRight, pointsLeft, pointsRight):
     WIN.blit(pointsRightText, (WINDOW_WIDTH - 80 - textWidth, 50))
 
 
-def main():
+class PVPGame:
+    def __init__(self, WIN, clock):
+        self.WIN = WIN
+        self.clock = clock
+
+        self.ball = Ball(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+        self.walls = Wall()
+        self.playerLeft = Paddle("left")
+        self.playerRight = Paddle("right")
+
+        self.pointsLeft = 0
+        self.pointsRight = 0
+
+    def run(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+
+            everyFrame(self.playerLeft, self.playerRight)
+            keys = pygame.key.get_pressed()
+            handleKeyPress(keys, self.playerLeft, self.playerRight)
+            move(self.ball)
+            checkCollision(self.ball, self.playerLeft, self.playerRight)
+            self.pointsLeft, self.pointsRight = checkPoints(
+                self.ball, self.pointsLeft, self.pointsRight
+            )
+            draw(
+                self.WIN,
+                self.ball,
+                self.walls,
+                self.playerLeft,
+                self.playerRight,
+                self.pointsLeft,
+                self.pointsRight,
+            )
+
+            pygame.display.update()
+            self.clock.tick(FPS)
+
+
+if __name__ == "__main__":
     WIN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("PONG")
     clock = pygame.time.Clock()
 
-    ball = Ball(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
-    walls = Wall()
-    playerLeft = Paddle("left")
-    playerRight = Paddle("right")
-
-    pointsLeft = 0
-    pointsRight = 0
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
-        everyFrame(playerLeft, playerRight)
-        keys = pygame.key.get_pressed()
-        handleKeyPress(keys, playerLeft, playerRight)
-        move(ball)
-        checkCollision(ball, playerLeft, playerRight)
-        pointsLeft, pointsRight = checkPoints(ball, pointsLeft, pointsRight)
-        draw(WIN, ball, walls, playerLeft, playerRight, pointsLeft, pointsRight)
-
-        pygame.display.update()
-        clock.tick(FPS)
+    pvpGame = PVPGame(WIN, clock)
+    pvpGame.run()

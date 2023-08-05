@@ -1,6 +1,11 @@
 import re
 import tkinter
 
+import pygame
+
+from globals import *
+from PlayerVsPlayer import PVPGame
+
 
 def isValidIp(ip):
     pattern = r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,4}$"
@@ -17,12 +22,15 @@ def isValidIp(ip):
 
 
 def playGame(gameMode, inputIp):
+    WIN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    pygame.display.set_caption("PONG")
+    clock = pygame.time.Clock()
+
     if gameMode == "pvp":
-        # play vs player
-        pass
+        pvpGame = PVPGame(WIN, clock)
+        pvpGame.run()
 
     elif gameMode == "pve":
-        # play vs computed
         pass
 
     else:
@@ -74,7 +82,7 @@ def main():
 
     tkinter.Button(
         window, text="Play", command=lambda: playGame(gameMode.get(), onlineEntry.get())
-    )
+    ).grid(row=5, column=0, padx=15, pady=15, ipadx=20, ipady=5)
 
     window.mainloop()
 
