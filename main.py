@@ -4,6 +4,7 @@ import tkinter
 import pygame
 
 from globals import *
+from PlayerVsComputer import PVEGame
 from PlayerVsPlayer import PVPGame
 
 
@@ -21,22 +22,26 @@ def isValidIp(ip):
     return False
 
 
-def playGame(gameMode, inputIp):
+def playGame(window, gameMode, inputIp):
     WIN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("PONG")
     clock = pygame.time.Clock()
 
     if gameMode == "pvp":
+        window.destroy()
         pvpGame = PVPGame(WIN, clock)
         pvpGame.run()
 
     elif gameMode == "pve":
-        pass
+        window.destroy()
+        pveGame = PVEGame(WIN, clock)
+        pveGame.run()
 
     else:
         if isValidIp(inputIp):
             return
 
+        window.destroy()
         playerIp, playerPort = inputIp.split(":")
         pass
 
@@ -81,7 +86,9 @@ def main():
     onlineEntry.grid(row=4, column=0, padx=15, pady=15, sticky=tkinter.W)
 
     tkinter.Button(
-        window, text="Play", command=lambda: playGame(gameMode.get(), onlineEntry.get())
+        window,
+        text="Play",
+        command=lambda: playGame(window, gameMode.get(), onlineEntry.get()),
     ).grid(row=5, column=0, padx=15, pady=15, ipadx=20, ipady=5)
 
     window.mainloop()

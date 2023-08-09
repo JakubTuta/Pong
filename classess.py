@@ -1,6 +1,6 @@
 import pygame
 
-from globals import *
+from globals import COLORS, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
 class Ball:

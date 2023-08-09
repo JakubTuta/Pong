@@ -1,12 +1,8 @@
 import pygame
 
 from classess import Ball, Paddle, Wall
-from globals import COLORS, FPS, WINDOW_HEIGHT, WINDOW_WIDTH, font
-
-
-def everyFrame(playerLeft, playerRight):
-    playerLeft.set()
-    playerRight.set()
+from functions import checkCollision, checkPoints, checkWin, draw, setPaddles
+from globals import FPS, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
 def handleKeyPress(keys, playerLeft, playerRight):
@@ -19,64 +15,6 @@ def handleKeyPress(keys, playerLeft, playerRight):
         playerRight.move("up")
     elif keys[pygame.K_DOWN]:
         playerRight.move("down")
-
-
-def move(ball):
-    ball.move()
-
-
-def isBetween(object, bottomRange, topRange):
-    return object <= topRange and object >= bottomRange
-
-
-def checkCollision(ball, playerLeft, playerRight):
-    # ball with walls
-    if ball.y - Ball.radius <= Wall.topY or ball.y + Ball.radius >= Wall.bottomY:
-        ball.speedY *= -1
-
-    # ball with playerLeft
-    if isBetween(
-        ball.x - Ball.radius,
-        playerLeft.x,
-        playerLeft.x + Paddle.width,
-    ) and isBetween(ball.y, playerLeft.y, playerLeft.y + Paddle.height):
-        ball.calculateDirection(playerLeft)
-
-    # ball with playerRight
-    if isBetween(
-        ball.x + Ball.radius,
-        playerRight.x,
-        playerRight.x + Paddle.width,
-    ) and isBetween(ball.y, playerRight.y, playerRight.y + Paddle.height):
-        ball.calculateDirection(playerRight)
-
-
-def checkPoints(ball, pointsLeft, pointsRight):
-    if ball.x + Ball.radius < 0:
-        pointsRight += 1
-        ball.reset()
-
-    elif ball.x - Ball.radius > WINDOW_WIDTH:
-        pointsLeft += 1
-        ball.reset()
-
-    return pointsLeft, pointsRight
-
-
-def draw(WIN, ball, walls, playerLeft, playerRight, pointsLeft, pointsRight):
-    WIN.fill((COLORS["black"]))
-
-    ball.draw(WIN)
-    walls.draw(WIN)
-    playerLeft.draw(WIN)
-    playerRight.draw(WIN)
-
-    pointsLeftText = font.render(f"{pointsLeft}", True, COLORS["white"])
-    WIN.blit(pointsLeftText, (80, 50))
-
-    pointsRightText = font.render(f"{pointsRight}", True, COLORS["white"])
-    textWidth = font.size(f"{pointsRight}")[0]
-    WIN.blit(pointsRightText, (WINDOW_WIDTH - 80 - textWidth, 50))
 
 
 class PVPGame:
@@ -99,10 +37,10 @@ class PVPGame:
                     pygame.quit()
                     quit()
 
-            everyFrame(self.playerLeft, self.playerRight)
+            setPaddles(self.playerLeft, self.playerRight)
             keys = pygame.key.get_pressed()
             handleKeyPress(keys, self.playerLeft, self.playerRight)
-            move(self.ball)
+            self.ball.move()
             checkCollision(self.ball, self.playerLeft, self.playerRight)
             self.pointsLeft, self.pointsRight = checkPoints(
                 self.ball, self.pointsLeft, self.pointsRight
@@ -116,6 +54,9 @@ class PVPGame:
                 self.pointsLeft,
                 self.pointsRight,
             )
+
+            if checkWin(self.pointsLeft, self.pointsRight):
+                break
 
             pygame.display.update()
             self.clock.tick(FPS)
