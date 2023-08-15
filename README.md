@@ -4,7 +4,7 @@ This project is a simple clone of the classic Pong game, where there are 2 playe
 
 ## Controls
 
-Left player: use "W" or "S"
+Left player: use "W" or "S" \
 Right player: use "Arrow up" or "Arrow down"
 
 ## How to start
