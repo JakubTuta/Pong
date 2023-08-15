@@ -1,25 +1,12 @@
-import re
 import tkinter
 
 import pygame
 
+from functions import isValidIp
 from globals import *
 from OnlineGame import OnlineGame
 from PlayerVsComputer import PVEGame
 from PlayerVsPlayer import PVPGame
-
-
-def isValidIp(ip):
-    pattern = r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,4}$"
-    if re.match(pattern, ip) is not None:
-        myIp, myPort = ip.split(":")
-        for num in myIp.split("."):
-            if not (0 <= int(num) <= 255):
-                return False
-        if not (1 <= int(myPort) <= 9999):
-            return False
-        return True
-    return False
 
 
 def playGame(window, side, gameMode, inputIp):
@@ -84,7 +71,7 @@ def main():
 
     tkinter.Label(
         window,
-        text="(Incase of online mode) Enter ip address and port in format - ip:port (255.255.255.255:2137)",
+        text="(Incase of online mode) Enter ip address and port in format - ip:port like (255.255.255.255:2137)",
         font=("Times New Roman", 15, "italic"),
     ).grid(row=3, column=0, padx=15, pady=15, sticky=tkinter.W)
 

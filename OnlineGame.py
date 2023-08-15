@@ -4,7 +4,7 @@ import time
 import pygame
 
 from classess import Ball, Paddle, Wall
-from functions import checkCollision, checkPoints, checkWin, draw, setPaddles
+from functions import checkCollision, checkPoints, checkWin, draw, isValidIp
 from globals import BYTES_OF_DATA, COLORS, FPS, WINDOW_HEIGHT, WINDOW_WIDTH, font
 
 
@@ -206,3 +206,28 @@ class OnlineGame:
     def readDataFromServer(self):
         data = self.mySocket.recv(BYTES_OF_DATA).decode().split("/")
         return float(data[0]), float(data[1]), float(data[2]), float(data[3])
+
+
+if __name__ == "__main__":
+    data = input(
+        "Enter ip address and port in format - ip:port like (255.255.255.255:2137)"
+    )
+    while not isValidIp(data):
+        print("Incorrect ip and / or port!")
+        data = input(
+            "Enter ip address and port in format - ip:port like (255.255.255.255:2137)"
+        )
+
+    ip, port = data.split(":")
+
+    side = input("Which side are you on (server / client)?: ")
+    while side != "server" and side != "client":
+        print("Incorrect side choice!")
+        side = input("Which side are you on (server / client)?: ")
+
+    WIN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    pygame.display.set_caption("PONG")
+    clock = pygame.time.Clock()
+
+    onlineGame = OnlineGame(WIN, clock, side, ip, port)
+    onlineGame.run()

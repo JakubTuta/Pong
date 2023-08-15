@@ -1,5 +1,20 @@
+import re
+
 from classess import Ball, Paddle, Wall
 from globals import COLORS, POINTS_TO_WIN, WINDOW_WIDTH, font
+
+
+def isValidIp(ip):
+    pattern = r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,4}$"
+    if re.match(pattern, ip) is not None:
+        myIp, myPort = ip.split(":")
+        for num in myIp.split("."):
+            if not (0 <= int(num) <= 255):
+                return False
+        if not (1 <= int(myPort) <= 9999):
+            return False
+        return True
+    return False
 
 
 def setPaddles(playerLeft, playerRight):
