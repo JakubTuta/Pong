@@ -21,7 +21,10 @@ def checkCollision(ball, playerLeft, playerRight):
         ball.x - Ball.radius,
         playerLeft.x,
         playerLeft.x + Paddle.width,
-    ) and isBetween(ball.y, playerLeft.y, playerLeft.y + Paddle.height):
+    ) and (
+        isBetween(ball.y - Ball.radius, playerLeft.y, playerLeft.y + Paddle.height)
+        or isBetween(ball.y + Ball.radius, playerLeft.y, playerLeft.y + Paddle.height)
+    ):
         ball.calculateDirection(playerLeft)
 
     # ball with playerRight
@@ -29,7 +32,10 @@ def checkCollision(ball, playerLeft, playerRight):
         ball.x + Ball.radius,
         playerRight.x,
         playerRight.x + Paddle.width,
-    ) and isBetween(ball.y, playerRight.y, playerRight.y + Paddle.height):
+    ) and (
+        isBetween(ball.y - Ball.radius, playerRight.y, playerRight.y + Paddle.height)
+        or isBetween(ball.y + Ball.radius, playerRight.y, playerRight.y + Paddle.height)
+    ):
         ball.calculateDirection(playerRight)
 
 

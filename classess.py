@@ -29,9 +29,13 @@ class Ball:
         self.speedX *= -1
 
         if paddle.prevPosition < paddle.currentPosition:
+            if self.speedY < 0:
+                self.speedY = 0
             self.speedY = Ball.baseSpeed
 
         elif paddle.prevPosition > paddle.currentPosition:
+            if self.speedY > 0:
+                self.speedY = 0
             self.speedY = -Ball.baseSpeed
 
 

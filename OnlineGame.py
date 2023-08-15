@@ -1,8 +1,36 @@
 import socket
 import time
 
+import pygame
+
 from classess import Ball, Paddle, Wall
-from globals import WINDOW_HEIGHT, WINDOW_WIDTH
+from functions import checkCollision, checkPoints, checkWin, draw, setPaddles
+from globals import BYTES_OF_DATA, COLORS, FPS, WINDOW_HEIGHT, WINDOW_WIDTH, font
+
+
+def handleKeyPress(keys, player, side):
+    if side == "server":
+        if keys[pygame.K_w]:
+            player.move("up")
+        elif keys[pygame.K_s]:
+            player.move("down")
+
+    else:
+        if keys[pygame.K_UP]:
+            player.move("up")
+        elif keys[pygame.K_DOWN]:
+            player.move("down")
+
+
+def printNames(WIN, playerLeftName, playerRightName):
+    textHeight = font.size("sample text")[1]
+
+    playerLeft = font.render(f"{playerLeftName}", True, COLORS["white"])
+    WIN.blit(playerLeft, (80, 50 + 10 + textHeight))
+
+    playerRight = font.render(f"{playerRightName}", True, COLORS["white"])
+    textWidth = font.size(f"{playerRightName}")[0]
+    WIN.blit(playerRight, (WINDOW_WIDTH - 80 - textWidth, 50 + 10 + textHeight))
 
 
 class OnlineGame:
@@ -35,9 +63,9 @@ class OnlineGame:
         print("Connected to the game")
 
         if self.side == "server":
-            print("jesteś serwerem")
+            self.runServerGame()
         else:
-            print("jesteś klientem")
+            self.runClientGame()
 
     def connectToGame(self):
         if self.side == "server":
@@ -71,3 +99,110 @@ class OnlineGame:
 
         else:
             return False
+
+    def runServerGame(self):
+        clientName = self.connection.recv(BYTES_OF_DATA).decode()
+        self.connection.send(self.myName.encode())
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+
+            self.sendDataToClient(
+                self.playerLeft.prevPosition,
+                self.playerLeft.y,
+                self.ball.x,
+                self.ball.y,
+            )
+            (
+                self.playerRight.prevPosition,
+                self.playerRight.y,
+            ) = self.readDataFromClient()
+
+            self.playerLeft.prevPosition = self.playerLeft.y
+            keys = pygame.key.get_pressed()
+            handleKeyPress(keys, self.playerLeft, "server")
+            self.ball.move()
+            checkCollision(self.ball, self.playerLeft, self.playerRight)
+            self.pointsLeft, self.pointsRight = checkPoints(
+                self.ball, self.pointsLeft, self.pointsRight
+            )
+            draw(
+                self.WIN,
+                self.ball,
+                self.walls,
+                self.playerLeft,
+                self.playerRight,
+                self.pointsLeft,
+                self.pointsRight,
+            )
+            printNames(self.WIN, self.myName, clientName)
+
+            if checkWin(self.pointsLeft, self.pointsRight):
+                break
+
+            pygame.display.update()
+            self.clock.tick(FPS)
+
+    def runClientGame(self):
+        self.mySocket.send(self.myName.encode())
+        serverName = self.mySocket.recv(BYTES_OF_DATA).decode()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+
+            (
+                self.playerLeft.prevPosition,
+                self.playerLeft.y,
+                self.ball.x,
+                self.ball.y,
+            ) = self.readDataFromServer()
+            self.sendDataToServer(self.playerRight.prevPosition, self.playerRight.y)
+
+            self.playerRight.prevPosition = self.playerRight.y
+            keys = pygame.key.get_pressed()
+            handleKeyPress(keys, self.playerRight, "client")
+            self.ball.move()
+            checkCollision(self.ball, self.playerLeft, self.playerRight)
+            self.pointsLeft, self.pointsRight = checkPoints(
+                self.ball, self.pointsLeft, self.pointsRight
+            )
+            draw(
+                self.WIN,
+                self.ball,
+                self.walls,
+                self.playerLeft,
+                self.playerRight,
+                self.pointsLeft,
+                self.pointsRight,
+            )
+            printNames(self.WIN, self.myName, serverName)
+
+            if checkWin(self.pointsLeft, self.pointsRight):
+                break
+
+            pygame.display.update()
+            self.clock.tick(FPS)
+
+    # server -> client
+    def sendDataToClient(self, prevPlayerY, playerY, ballX, ballY):
+        self.connection.send(f"{prevPlayerY}/{playerY}/{ballX}/{ballY}".encode())
+
+    # server <- client
+    def readDataFromClient(self):
+        data = self.connection.recv(BYTES_OF_DATA).decode().split("/")
+        return float(data[0]), float(data[1])
+
+    # client -> server
+    def sendDataToServer(self, prevPlayerY, playerY):
+        self.mySocket.send(f"{prevPlayerY}/{playerY}".encode())
+
+    # client <- server
+    def readDataFromServer(self):
+        data = self.mySocket.recv(BYTES_OF_DATA).decode().split("/")
+        return float(data[0]), float(data[1]), float(data[2]), float(data[3])
