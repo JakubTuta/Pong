@@ -8,8 +8,8 @@ from classess import Ball, Paddle, Wall
 from functions import checkCollision, checkPoints, checkWin, draw, setPaddles
 from globals import FPS, WINDOW_HEIGHT, WINDOW_WIDTH
 
-LOAD_BEST_POPULATION = False
-SAVE_BEST_POPULATION = False
+LOAD_BEST_POPULATION = True
+SAVE_BEST_POPULATION = True
 
 
 def handleKeyPress(keys, playerLeft):
@@ -60,15 +60,12 @@ class PVEGame:
             PVEGame.savePopulation("population.dat", population)
 
     def mainGame(self, genomes, config):
-        pointsLeft = 0
-        pointsRight = 0
-
         nets = []
         ge = []
         paddles = []
 
         for _, g in genomes:
-            g.fitness = 1
+            g.fitness = 0
             nets.append(neat.nn.FeedForwardNetwork.create(g, config))
             ge.append(g)
             paddles.append(Paddle("right"))
@@ -77,7 +74,12 @@ class PVEGame:
             self.playerLeft = Paddle("left")
             ball = Ball(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
 
-            while True:
+            pointsLeft = 0
+            pointsRight = 0
+
+            gameRunning = True
+
+            while gameRunning:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -104,10 +106,10 @@ class PVEGame:
                 )
 
                 if checkWin(pointsLeft, pointsRight):
-                    break
+                    gameRunning = False
 
                 pygame.display.update()
-                # self.clock.tick(FPS)
+                self.clock.tick(2 * FPS)
 
     @staticmethod
     def savePopulation(filename, population):
@@ -121,7 +123,7 @@ class PVEGame:
 
     @staticmethod
     def handleNEAT(net, paddle, ball):
-        inputs = [paddle.y, ball.x, ball.y]
+        inputs = [paddle.y, paddle.y + Paddle.height, ball.x, ball.y]
 
         output = net.activate((inputs))
         outputList = [("stay", output[0]), ("up", output[1]), ("down", output[2])]
