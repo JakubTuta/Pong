@@ -50,10 +50,6 @@ class PVEGame:
         if LOAD_BEST_POPULATION:
             population = PVEGame.loadPopulation("population.dat")
 
-        population.add_reporter(neat.StdOutReporter(True))
-        stats = neat.StatisticsReporter()
-        population.add_reporter(stats)
-
         population.run(self.mainGame, 1)
 
         if SAVE_BEST_POPULATION:
@@ -109,7 +105,7 @@ class PVEGame:
                     gameRunning = False
 
                 pygame.display.update()
-                self.clock.tick(2 * FPS)
+                self.clock.tick(FPS)
 
     @staticmethod
     def savePopulation(filename, population):
