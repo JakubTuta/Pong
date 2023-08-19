@@ -119,7 +119,7 @@ class PVEGame:
 
     @staticmethod
     def handleNEAT(net, paddle, ball):
-        inputs = [paddle.y, paddle.y + Paddle.height, ball.x, ball.y]
+        inputs = [paddle.y, paddle.y + Paddle.height, ball.y, abs(ball.x - paddle.x)]
 
         output = net.activate((inputs))
         outputList = [("stay", output[0]), ("up", output[1]), ("down", output[2])]
