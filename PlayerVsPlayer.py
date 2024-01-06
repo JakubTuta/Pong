@@ -1,6 +1,6 @@
 import pygame
 
-from classess import Ball, Paddle, Wall
+from classes import Ball, Paddle, Wall
 from functions import checkCollision, checkPoints, checkWin, draw, setPaddles
 from globals import FPS, WINDOW_HEIGHT, WINDOW_WIDTH
 

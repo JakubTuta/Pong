@@ -1,6 +1,6 @@
 import re
 
-from classess import Ball, Paddle, Wall
+from classes import Ball, Paddle, Wall
 from globals import COLORS, POINTS_TO_WIN, WINDOW_WIDTH, font
 
 

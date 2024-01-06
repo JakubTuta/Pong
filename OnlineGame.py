@@ -3,7 +3,7 @@ import time
 
 import pygame
 
-from classess import Ball, Paddle, Wall
+from classes import Ball, Paddle, Wall
 from functions import checkCollision, checkPoints, checkWin, draw, isValidIp
 from globals import BYTES_OF_DATA, COLORS, FPS, WINDOW_HEIGHT, WINDOW_WIDTH, font
 
