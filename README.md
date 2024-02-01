@@ -31,6 +31,8 @@ or run any file separately
 
 ```
 python PlayerVsPlayer.py
-python PlayerVsComputed.py
+python PlayerVsComputer.py
 python OnlineGame.py
 ```
+
+![screenshots](main_window.png)
