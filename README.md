@@ -36,4 +36,4 @@ python OnlineGame.py
 ```
 
 ## Main window
-![alt text](screenshots/main_window.png)
+![alt text](https://imgur.com/wnxSHYd)
