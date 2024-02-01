@@ -37,3 +37,6 @@ python OnlineGame.py
 
 ## Main window
 ![alt text](https://i.imgur.com/wnxSHYd.png)
+
+## Game
+![alt text](https://i.imgur.com/fKKCgbJ.png)
