@@ -35,4 +35,5 @@ python PlayerVsComputer.py
 python OnlineGame.py
 ```
 
-![screenshots](main_window.png)
+## Main window
+![alt text](screenshots/main_window.png)
