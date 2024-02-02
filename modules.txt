@@ -1,3 +1,5 @@
 pygame
 tkinter
-neat-python
+scikit-fuzzy
+matplotlib
+numpy

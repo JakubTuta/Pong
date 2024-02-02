@@ -18,8 +18,8 @@ def isValidIp(ip):
 
 
 def setPaddles(playerLeft, playerRight):
-    playerLeft.set()
-    playerRight.set()
+    playerLeft.set_position()
+    playerRight.set_position()
 
 
 def isBetween(object, bottomRange, topRange):

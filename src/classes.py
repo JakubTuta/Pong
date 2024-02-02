@@ -56,8 +56,8 @@ class Wall:
 class Paddle:
     height = 100
     width = 20
+    speed = 10
     __padding = 50
-    __speed = 10
 
     def __init__(self, side):
         if side == "left":
@@ -77,11 +77,11 @@ class Paddle:
     def move(self, direction):
         if direction == "up":
             if self.isMoveUpAvailable():
-                self.y -= Paddle.__speed
+                self.y -= Paddle.speed
 
         elif direction == "down":
             if self.isMoveDownAvailable():
-                self.y += Paddle.__speed
+                self.y += Paddle.speed
 
         self.currentPosition = self.y
 
@@ -91,5 +91,5 @@ class Paddle:
     def isMoveDownAvailable(self):
         return self.y + Paddle.height < Wall.bottomY
 
-    def set(self):
+    def set_position(self):
         self.prevPosition = self.y
